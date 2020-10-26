@@ -32,10 +32,12 @@ public class HighscoreManager : MonoBehaviour
 
     public static HighscoreManager Instance { get; private set; }
 
-    private void Start()
+    private void Awake()
     {
         Instance = this;
         saveDataPath = Application.persistentDataPath + "/solitaireSaveData.ssd";
+        if (highscoreCanvas.activeSelf)
+            highscoreCanvas.SetActive(false);
     }
 
     public void AddCurrentTime()
