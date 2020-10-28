@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 public static class History
 {
@@ -36,6 +37,7 @@ public static class History
                 OpenDrawPile openDrawPile = oldCardPile as OpenDrawPile;
                 foreach (Card card in cards)
                     card.cardPile.Remove(card);
+                cards.Reverse();
                 openDrawPile.Add(cards);
             }
         }

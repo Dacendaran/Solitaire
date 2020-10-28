@@ -46,9 +46,7 @@ public class HighscoreManager : MonoBehaviour
         if (highscores.Count == 5 && highscores[4].playTime <= time)
             return;
 
-        DateTime currentDateTime = DateTime.Now;
-        string date = currentDateTime.ToString("F", CultureInfo.CreateSpecificCulture("en-US"));
-
+        string date = DateTime.Now.ToString("dd MMMM yyyy, HH:mm");
         Highscore newHighscore = new Highscore(date, time, GameManager.Instance.ActionCounter);
 
         if (!highscoresAreLoaded)

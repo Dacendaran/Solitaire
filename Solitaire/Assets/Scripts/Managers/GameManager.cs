@@ -80,7 +80,8 @@ public class GameManager : MonoBehaviour
             discardPile.Clear();
 
         MouseDragManager.draggingEnabled = true;
-        GiveCards();
+        Timer.Instance.Stop();
+        GiveCards();        
     }
 
     public Card FindCard(CardType type, int value)
