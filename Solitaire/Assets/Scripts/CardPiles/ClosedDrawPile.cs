@@ -3,13 +3,12 @@ using UnityEngine;
 
 public class ClosedDrawPile : CardPile
 {
-    public Transform discardArea;
     public OpenDrawPile openDrawPile;
 
     public void AddCards(List<Card> cardsToAdd, bool addStepToHistory)
     {
         if (addStepToHistory)
-            History.Add(new History.Step(cardsToAdd[0].cardPile, cardsToAdd));
+            History.Add(new History.Step(cardsToAdd[0].CardPile, cardsToAdd));
 
         foreach(Card card in cardsToAdd)
             Add(card, false);
@@ -18,7 +17,7 @@ public class ClosedDrawPile : CardPile
     public override void Add(Card cardToAdd, bool addStepToHistory = true)
     {
         if (addStepToHistory)
-            History.Add(new History.Step(cardToAdd.cardPile, cardToAdd));
+            History.Add(new History.Step(cardToAdd.CardPile, cardToAdd));
 
         cardToAdd.ShowSide(CardSide.Back);
         cardToAdd.transform.position = transform.position;
@@ -28,17 +27,16 @@ public class ClosedDrawPile : CardPile
 
     public void OnClick()
     {
-        GameManager.Instance.IncreaseActionCounter();
-
         if (Cards.Count > 0)
         {
             Card cardToDiscard = Cards[Cards.Count - 1];
-            Remove(cardToDiscard);
-            openDrawPile.Add(cardToDiscard);
+            cardToDiscard.Move(openDrawPile, false, true, true);
         }
         else
         {
             openDrawPile.AddAllBackToClosedDrawPile();
         }
     }
+
+    public override bool CardIsDragable(Card card) => false;
 }

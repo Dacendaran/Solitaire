@@ -3,6 +3,7 @@
 public abstract class InteractableCardPile : CardPile, ICardCanBePutOn
 {
     protected BoxCollider2D boxCollider;
+    public CardPile CardPile { get { return this; } }
 
     private void Start()
     {

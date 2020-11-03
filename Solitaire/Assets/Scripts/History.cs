@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 public static class History
 {
@@ -27,18 +26,14 @@ public static class History
         {
             if(card != null)
             {
-                card.cardPile.Remove(card);
-                oldCardPile.Add(card, false);
+                card.Move(oldCardPile, false, false, true);
                 if (flippedCard != null)
                     flippedCard.ShowSide(flippedCard.CurrentlyShowingSide == CardSide.Back ? CardSide.Front : CardSide.Back);
             }
             else
             {
-                OpenDrawPile openDrawPile = oldCardPile as OpenDrawPile;
-                foreach (Card card in cards)
-                    card.cardPile.Remove(card);
                 cards.Reverse();
-                openDrawPile.Add(cards);
+                cards.Move(oldCardPile, false);
             }
         }
     }
@@ -68,7 +63,6 @@ public static class History
         if (history.Count == 0)
             return;
 
-        GameManager.Instance.IncreaseActionCounter();
         Step stepToUndo = history.Pop();
         stepToUndo.Undo();
     }

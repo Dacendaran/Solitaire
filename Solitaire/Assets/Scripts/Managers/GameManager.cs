@@ -1,16 +1,17 @@
-﻿using Dacen.ExtensionMethods.Generic;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class GameManager : MonoBehaviour
 {
-    private List<Card> cardInstances;    
+    private List<Card> cardInstances;
+    private int actionCounter;
 
     public readonly float cardOffset = 0.4f;
     public List<GameObject> cardPrefabs;
     public Sprite cardBack;
+    public TextMeshProUGUI actionCounterTextMesh;
     public bool testMode = false;
 
     [Header("Card piles")]
@@ -21,7 +22,14 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance { get; private set; }
     public bool IsAutoCompleting { get; private set; } = false;
-    public int ActionCounter { get; private set; }
+    public int ActionCounter { get { return actionCounter; } set
+        {
+            actionCounter = value;
+            actionCounterTextMesh.text = ActionCounter.ToString();
+            if (ActionCounter == 1)
+                Timer.Instance.StartCounting();
+        }
+    }
 
     private void Awake()
     {
@@ -113,7 +121,7 @@ public class GameManager : MonoBehaviour
         while (!DiscardPile.AllAreFull())
         {
             DiscardPile smallestDiscardPile = DiscardPile.GetSmallest(out Card cardToAdd);
-            cardToAdd.Move(smallestDiscardPile, false);
+            cardToAdd.Move(smallestDiscardPile, false, false, true);
             yield return wait;
         }
 
@@ -126,13 +134,5 @@ public class GameManager : MonoBehaviour
         Timer.Instance.Stop();
         HighscoreManager.Instance.AddCurrentTime();
         History.Reset();
-    }
-
-    public void IncreaseActionCounter()
-    {
-        if(ActionCounter == 0)
-            Timer.Instance.StartCounting();
-
-        ActionCounter++;
     }
 }

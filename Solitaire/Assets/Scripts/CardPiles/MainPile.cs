@@ -1,5 +1,4 @@
-﻿using Dacen.ExtensionMethods.General;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class MainPile : InteractableCardPile
@@ -41,7 +40,7 @@ public class MainPile : InteractableCardPile
     public override void Add(Card cardToPutOn, bool addStepToHistory = true)
     {
         if (addStepToHistory)
-            History.Add(new History.Step(cardToPutOn.cardPile, cardToPutOn));
+            History.Add(new History.Step(cardToPutOn.CardPile, cardToPutOn));
 
         cardToPutOn.transform.position = transform.position + Cards.Count * GameManager.Instance.cardOffset * Vector3.down;
         cardToPutOn.transform.parent = Cards.Count == 0 ? transform : TopCard.transform;
@@ -56,7 +55,7 @@ public class MainPile : InteractableCardPile
     {
         foreach (Card childCard in childCards)
         {
-            childCard.cardPile = this;
+            childCard.CardPile = this;
             childCard.SortingOrder = Cards.Count;
             Cards.Add(childCard);
         }
@@ -92,4 +91,6 @@ public class MainPile : InteractableCardPile
                 return false;
         return true;
     }
+
+    public override bool CardIsDragable(Card card) => card.CurrentlyShowingSide == CardSide.Front;
 }

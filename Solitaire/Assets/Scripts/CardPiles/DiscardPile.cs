@@ -57,7 +57,7 @@ public class DiscardPile : InteractableCardPile
     public override void Add(Card cardToPutOn, bool addStepToHistory = true)
     {
         if (addStepToHistory)
-            History.Add(new History.Step(cardToPutOn.cardPile, cardToPutOn));
+            History.Add(new History.Step(cardToPutOn.CardPile, cardToPutOn));
 
         MyCardType = cardToPutOn.type;
         boxCollider.enabled = false;
@@ -78,4 +78,6 @@ public class DiscardPile : InteractableCardPile
         MyCardType = CardType.None;
         boxCollider.enabled = true;
     }
+
+    public override bool CardIsDragable(Card card) => true;
 }

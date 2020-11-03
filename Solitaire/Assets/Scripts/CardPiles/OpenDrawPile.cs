@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class OpenDrawPile : CardPile
@@ -16,23 +15,18 @@ public class OpenDrawPile : CardPile
         }
 
         SetCardPositions();
-        SetOnlyTopCardDragable();
     }
 
     public override void Add(Card cardToAdd, bool addStepToHistory = true)
     {
         if (addStepToHistory)
-            History.Add(new History.Step(cardToAdd.cardPile, cardToAdd));
+            History.Add(new History.Step(cardToAdd.CardPile, cardToAdd));
 
         cardToAdd.transform.parent = transform;
         cardToAdd.ShowSide(CardSide.Front);
         base.Add(cardToAdd, addStepToHistory);
 
-        SetCardPositions();
-        SetOnlyTopCardDragable();
-
-        cardToAdd.dragable = false;
-        StartCoroutine(SetDragableAfterOneFrame(cardToAdd));        
+        SetCardPositions();     
     }
 
     private void SetCardPositions()
@@ -53,27 +47,17 @@ public class OpenDrawPile : CardPile
 
     public void AddAllBackToClosedDrawPile()
     {
-        Cards.Reverse();
-        closedDrawPile.AddCards(Cards, true);
-        Cards.Clear();
+        if (Cards.Count == 0)
+            return;
+
+        Cards.Move(closedDrawPile, true);
     }
 
     public override void Remove(Card cardToRemove)
     {
         base.Remove(cardToRemove);
         SetCardPositions();
-        SetOnlyTopCardDragable();
     }
 
-    private void SetOnlyTopCardDragable()
-    {
-        for (int i = 0; i < Cards.Count; i++)
-            Cards[i].dragable = i == Cards.Count - 1;
-    }
-
-    private IEnumerator SetDragableAfterOneFrame(Card card)
-    {
-        yield return null;
-        card.dragable = true;
-    }
+    public override bool CardIsDragable(Card card) => Cards.IndexOf(card) == Cards.Count - 1;
 }

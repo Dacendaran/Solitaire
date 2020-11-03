@@ -30,7 +30,7 @@ public class MouseDragManager : MonoBehaviour
                 return;
 
             Card hitCard = null;
-            foreach(Collider2D collider in overlappingColliders)
+            foreach (Collider2D collider in overlappingColliders)
             {
                 Card card = collider.GetComponent<Card>();
                 if (!card.IsDragable)
@@ -39,14 +39,14 @@ public class MouseDragManager : MonoBehaviour
                     hitCard = card;
             }
 
-            if(hitCard != null)
+            if (hitCard != null)
             {
                 PrintDebugMessage("Drag is starting on " + currentlyDraggedCard);
                 currentlyDraggedCard = hitCard;
-                hitCard.OnStartDrag();
+                hitCard.OnBeginDrag();
             }
         }
-        else if(Input.GetMouseButton(0) && currentlyDraggedCard != null && MousePosition != positionLastFrame)
+        else if (Input.GetMouseButton(0) && currentlyDraggedCard != null && MousePosition != positionLastFrame)
         {
             PrintDebugMessage("Drag is continuing on " + currentlyDraggedCard);
             currentlyDraggedCard.OnDrag(MousePosition - positionLastFrame);

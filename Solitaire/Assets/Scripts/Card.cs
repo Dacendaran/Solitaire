@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using Dacen.ExtensionMethods.Generic;
-using Dacen.ExtensionMethods.General;
 using System.Linq;
 
 public enum CardColor { Red, Black }
@@ -13,16 +11,14 @@ public class Card : MonoBehaviour, ICardCanBePutOn
     private SpriteRenderer spriteRenderer;
     private BoxCollider2D boxCollider;
     private Sprite sprite;
-    private Vector3 positionOnStartDrag;
-    private int sortingOrderOnStartDrag;
-    public bool dragable = true;
+    private Vector3 positionOnStartDrag;  
 
     public int value;
     public CardType type;
-    [HideInInspector] public CardPile cardPile;
     public CardSide CurrentlyShowingSide { get; private set; } = CardSide.Front;
     public CardColor Color { get; private set; }
-    public int SortingOrder { get { return spriteRenderer.sortingOrder; } set { spriteRenderer.sortingOrder = value; } }   
+    public int SortingOrder { get { return spriteRenderer.sortingOrder; } set { spriteRenderer.sortingOrder = value; } }
+    public CardPile CardPile { get; set; }
 
     private void Awake()
     {        
@@ -40,25 +36,21 @@ public class Card : MonoBehaviour, ICardCanBePutOn
 
     public bool CardCanBePutOnHere(Card cardToPutOn)
     {
-        if(cardPile is InteractableCardPile)
+        if(CardPile is InteractableCardPile)
         {
-            InteractableCardPile interactableCardPile = cardPile as InteractableCardPile;
+            InteractableCardPile interactableCardPile = CardPile as InteractableCardPile;
             return interactableCardPile.CardCanBePutOnCard(this, cardToPutOn);
         }
         return false;
     }
 
-    public bool IsDragable => dragable && CurrentlyShowingSide == CardSide.Front;
+    public bool IsDragable => CardPile.CardIsDragable(this);
 
-    public void OnStartDrag(int sortingOrder = 100)
+    public void OnBeginDrag()
     {
         positionOnStartDrag = transform.position;
-        sortingOrderOnStartDrag = SortingOrder;
-        SortingOrder = sortingOrder;
-
-        if (transform.TryGetComponentsInChildrenExcludingSelf(out Card[] childCards))
-            for(int i = 0; i < childCards.Length; i++)
-                childCards[i].OnStartDrag(SortingOrder + 1 + i);
+        foreach (Card card in GetComponentsInChildren<Card>())
+            card.SortingOrder += 100;
     }
 
     public void OnDrag(Vector2 delta)
@@ -81,36 +73,29 @@ public class Card : MonoBehaviour, ICardCanBePutOn
             }
         }
 
-        if(validTargets.Count == 0)
+        if (validTargets.Count == 0)
         {
-            ResetPosition();
+            transform.position = positionOnStartDrag;
+            foreach (Card card in GetComponentsInChildren<Card>())
+                card.SortingOrder -= 100;
             return;
         }
 
-        Move(validTargets.GetClosest((Vector2)transform.position).Value, true);
+        Move(validTargets.GetClosest(transform.position).Value.CardPile, true, true, true);
     }
 
-    public void Move(ICardCanBePutOn newContainer, bool checkForAutoComplete)
-    {
-        GameManager.Instance.IncreaseActionCounter();
-        cardPile.Remove(this);
-        newContainer.Add(this);
+    public void Move(CardPile newCardPile, bool checkForAutoComplete, bool addStepToHistory, bool increaseActionCounter)
+    {        
+        CardPile.Remove(this);
+        newCardPile.Add(this, addStepToHistory);
         if (checkForAutoComplete)
             GameManager.Instance.CheckIfFinishedOrReadyForAutoComplete();
-    }
-
-    public void ResetPosition()
-    {
-        transform.position = positionOnStartDrag;
-        SortingOrder = sortingOrderOnStartDrag;
-
-        if (transform.TryGetComponentsInChildrenExcludingSelf(out Card[] childCards))
-            foreach(Card childCard in childCards)
-                childCard.ResetPosition();
+        if (increaseActionCounter)
+            GameManager.Instance.ActionCounter++;
     }
 
     public void Add(Card cardToPutOn, bool addStepToHistory = true)
     {        
-        cardPile.Add(cardToPutOn, true);
+        CardPile.Add(cardToPutOn, true);
     }
 }
