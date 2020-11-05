@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public List<GameObject> cardPrefabs;
     public Sprite cardBack;
     public TextMeshProUGUI actionCounterTextMesh;
+    // If true, all cards are sorted and put on 4 main piles when new cards are given.
     public bool testMode = false;
 
     [Header("Card piles")]
@@ -27,7 +28,7 @@ public class GameManager : MonoBehaviour
             actionCounter = value;
             actionCounterTextMesh.text = ActionCounter.ToString();
             if (ActionCounter == 1)
-                Timer.Instance.StartCounting();
+                Timer.Instance.enabled = true;
         }
     }
 
@@ -71,10 +72,12 @@ public class GameManager : MonoBehaviour
                 numberOfCards++;
             }
 
-            closedDrawPile.AddCards(cardsToGive, false);
+            foreach(Card card in cardsToGive)
+                closedDrawPile.Add(card, false);
         }
     }
 
+    // Gets executed by the respective button in the menu bar UI.
     public void GiveNewCards()
     {
         if (IsAutoCompleting)
@@ -88,7 +91,8 @@ public class GameManager : MonoBehaviour
             discardPile.Clear();
 
         MouseDragManager.draggingEnabled = true;
-        Timer.Instance.Stop();
+        Timer.Instance.enabled = false;
+        History.Reset();
         GiveCards();        
     }
 
@@ -131,8 +135,8 @@ public class GameManager : MonoBehaviour
 
     private void OnGameEnd()
     {
-        Timer.Instance.Stop();
-        HighscoreManager.Instance.AddCurrentTime();
+        int time = Timer.Instance.Stop();
+        HighscoreManager.Instance.Add(time);
         History.Reset();
     }
 }

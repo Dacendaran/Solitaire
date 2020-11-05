@@ -6,7 +6,7 @@ public enum CardColor { Red, Black }
 public enum CardType { None, Spades, Hearts, Diamonds, Clubs }
 public enum CardSide { Front, Back }
 
-public class Card : MonoBehaviour, ICardCanBePutOn
+public class Card : MonoBehaviour, ICardEndDragTarget
 {
     private SpriteRenderer spriteRenderer;
     private BoxCollider2D boxCollider;
@@ -63,16 +63,18 @@ public class Card : MonoBehaviour, ICardCanBePutOn
         List<Collider2D> overlappingColliders = new List<Collider2D>();
         boxCollider.OverlapCollider(new ContactFilter2D(), overlappingColliders);
 
-        if (overlappingColliders.ContainsComponent(out Dictionary<Collider2D, ICardCanBePutOn> validTargets))
+        // Ignore the invalid targets that overlap with the card.
+        if (overlappingColliders.ContainsComponent(out Dictionary<Collider2D, ICardEndDragTarget> validTargets))
         {
             for (int i = validTargets.Count - 1; i >= 0; i--)
             {
-                KeyValuePair<Collider2D, ICardCanBePutOn> pair = validTargets.ElementAt(i);
+                KeyValuePair<Collider2D, ICardEndDragTarget> pair = validTargets.ElementAt(i);
                 if (!pair.Value.CardCanBePutOnHere(this))
                     validTargets.Remove(pair.Key);
             }
         }
 
+        // If there is no valid target overlapping with the card, reset the card...
         if (validTargets.Count == 0)
         {
             transform.position = positionOnStartDrag;
@@ -81,6 +83,7 @@ public class Card : MonoBehaviour, ICardCanBePutOn
             return;
         }
 
+        // ...otherwise, move the card to the card pile of the closest valid target.
         Move(validTargets.GetClosest(transform.position).Value.CardPile, true, true, true);
     }
 

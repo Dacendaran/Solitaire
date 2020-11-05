@@ -1,18 +1,6 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-
-public class ClosedDrawPile : CardPile
+﻿public class ClosedDrawPile : CardPile
 {
     public OpenDrawPile openDrawPile;
-
-    public void AddCards(List<Card> cardsToAdd, bool addStepToHistory)
-    {
-        if (addStepToHistory)
-            History.Add(new History.Step(cardsToAdd[0].CardPile, cardsToAdd));
-
-        foreach(Card card in cardsToAdd)
-            Add(card, false);
-    }
 
     public override void Add(Card cardToAdd, bool addStepToHistory = true)
     {
@@ -25,6 +13,7 @@ public class ClosedDrawPile : CardPile
         base.Add(cardToAdd, addStepToHistory);
     }
 
+    // Gets executed by the "pointer click" event on the event trigger component.
     public void OnClick()
     {
         if (Cards.Count > 0)

@@ -4,7 +4,6 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Globalization;
 
 [Serializable]
 public class Highscore
@@ -40,9 +39,8 @@ public class HighscoreManager : MonoBehaviour
             highscoreCanvas.SetActive(false);
     }
 
-    public void AddCurrentTime()
+    public void Add(int time)
     {
-        int time = Timer.Instance.CurrentTime;
         if (highscores.Count == 5 && highscores[4].playTime <= time)
             return;
 
@@ -75,19 +73,6 @@ public class HighscoreManager : MonoBehaviour
         highscoresAreLoaded = true;
     }
 
-    public void ShowHighscores()
-    {
-        if (!highscoresAreLoaded)
-            Load();
-
-        for (int i = 0; i < highscores.Count; i++)
-        {
-            Highscore highscore = highscores[i];
-            if (highscore != null)
-                highscoreDisplays[i].Fill(highscore);
-        }
-    }
-
     private void Save()
     {
         BinaryFormatter formatter = new BinaryFormatter();
@@ -96,12 +81,26 @@ public class HighscoreManager : MonoBehaviour
         fileStream.Close();
     }
 
+    // Gets executed by the respective button in the menu bar UI.
     public void OnHighscoreButtonPressed()
     {
         highscoreCanvas.SetActive(!highscoreCanvas.activeSelf);
-        ShowHighscores();
+
+        if (highscoreCanvas.activeSelf)
+        {
+            if (!highscoresAreLoaded)
+                Load();
+
+            for (int i = 0; i < highscores.Count; i++)
+            {
+                Highscore highscore = highscores[i];
+                if (highscore != null)
+                    highscoreDisplays[i].Fill(highscore);
+            }
+        }             
     }
 
+    // Gets executed by the "reset button" in the highscore canvas.
     public void DeleteAll()
     {
         highscores = new List<Highscore>();

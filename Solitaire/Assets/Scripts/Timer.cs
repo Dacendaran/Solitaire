@@ -4,11 +4,11 @@ using Dacen.Utility;
 
 public class Timer : MonoBehaviour
 {
-    private float timeLastModifiedAt;
-    new private bool enabled = false;
+    private float currentTime;
+    private int displayTime;
 
     public TextMeshProUGUI textMesh;
-    public int CurrentTime { get; private set; }
+    [HideInInspector] new public bool enabled = false;
 
     public static Timer Instance { get; private set; }
 
@@ -22,27 +22,25 @@ public class Timer : MonoBehaviour
         if (!enabled)
             return;
 
-        if(Time.time - timeLastModifiedAt >= 1)
+        currentTime += Time.deltaTime;
+        if(currentTime >= displayTime + 1)
         {
-            CurrentTime++;
+            displayTime = Mathf.FloorToInt(currentTime);
             ShowTime();
-            timeLastModifiedAt = Time.time;
         }
     }
 
-    private void ShowTime() => textMesh.text = DacenUtility.ConvertToMinutesAndSeconds(CurrentTime);
+    private void ShowTime() => textMesh.text = DacenUtility.ConvertToMinutesAndSeconds(displayTime);
 
-    public void Stop() => enabled = false;
+    public int Stop()
+    {
+        enabled = false;
+        return displayTime;
+    }
 
     public void ResetTime()
     {
-        CurrentTime = 0;
+        currentTime = displayTime = 0;
         ShowTime();
-    }
-
-    public void StartCounting()
-    {
-        timeLastModifiedAt = Time.time;
-        enabled = true;
     }
 }

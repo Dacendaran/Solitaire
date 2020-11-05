@@ -2,7 +2,7 @@
 
 public class DiscardPile : InteractableCardPile
 {
-    private static readonly List<DiscardPile> allDiscardPiles = new List<DiscardPile>();
+    private static readonly List<DiscardPile> allDiscardPiles = new List<DiscardPile>(4);
 
     public CardType MyCardType { get; private set; } = CardType.None;
 
@@ -19,37 +19,32 @@ public class DiscardPile : InteractableCardPile
         return true;
     }
 
+    // Needed for auto completion.
     public static DiscardPile GetSmallest(out Card missingCard)
     {
-        missingCard = null;
         DiscardPile smallestDiscardPile = null;
 
-        foreach (DiscardPile discardPile in allDiscardPiles) {
-            Card missingCardOnThisPile = discardPile.GetMissingCard();
-            if (missingCard == null || missingCard.value > missingCardOnThisPile.value)
-            {
-                missingCard = missingCardOnThisPile;
+        foreach (DiscardPile discardPile in allDiscardPiles)
+            if (smallestDiscardPile == null || discardPile.Cards.Count < smallestDiscardPile.Cards.Count)
                 smallestDiscardPile = discardPile;
-            }
-        }
+
+        missingCard = smallestDiscardPile.GetMissingCard();
         return smallestDiscardPile;
     }
 
     public static List<CardType> GetMissingCardTypes()
     {
-        List<CardType> missingCardTypes = new List<CardType>() { CardType.Clubs, CardType.Diamonds, CardType.Hearts, CardType.Spades };
+        List<CardType> missingCardTypes = new List<CardType>(4) { CardType.Clubs, CardType.Diamonds, CardType.Hearts, CardType.Spades };
         foreach (DiscardPile discardPile in allDiscardPiles)
             if (discardPile.MyCardType != CardType.None)
                 missingCardTypes.Remove(discardPile.MyCardType);
         return missingCardTypes;
     }
 
+    // Returns the card that should be added on top of this discard pile (needed for auto completion).
     public Card GetMissingCard()
     {
-        if (MyCardType == CardType.None)
-            MyCardType = GetMissingCardTypes()[0];
-
-        return GameManager.Instance.FindCard(MyCardType, Cards.Count == 0 ? 1 : TopCard.value + 1);
+        return GameManager.Instance.FindCard(MyCardType != CardType.None ? MyCardType : GetMissingCardTypes()[0], Cards.Count == 0 ? 1 : TopCard.value + 1);
     }
 
     public override bool CardCanBePutOnHere(Card cardToPutOn) => Cards.Count == 0 && cardToPutOn.value == 1;
@@ -59,8 +54,11 @@ public class DiscardPile : InteractableCardPile
         if (addStepToHistory)
             History.Add(new History.Step(cardToPutOn.CardPile, cardToPutOn));
 
-        MyCardType = cardToPutOn.type;
-        boxCollider.enabled = false;
+        if(Cards.Count == 0) {
+            MyCardType = cardToPutOn.type;
+            boxCollider.enabled = false;
+        }
+        
         cardToPutOn.transform.position = transform.position;
         cardToPutOn.transform.parent = transform;
 
@@ -79,5 +77,6 @@ public class DiscardPile : InteractableCardPile
         boxCollider.enabled = true;
     }
 
+    // Can always return true since the MouseDragManager only allows for the top card to be dragged anyway.
     public override bool CardIsDragable(Card card) => true;
 }

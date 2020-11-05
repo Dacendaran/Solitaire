@@ -40,6 +40,7 @@ public static class History
 
     private static readonly Stack<Step> history = new Stack<Step>();
 
+    // A flipped card has to be added to the current history step, if a card gets moved away from a main pile and there is a card underneath it that is turned on its back.
     public static Card flippedCard = null;
 
     public static void Add(Step step)

@@ -3,13 +3,14 @@ using UnityEngine;
 
 public class MainPile : InteractableCardPile
 {
-    private static readonly List<MainPile> allMainPiles = new List<MainPile>();
+    private static readonly List<MainPile> allMainPiles = new List<MainPile>(7);
 
     private void Awake()
     {
         allMainPiles.Add(this);
     }
 
+    // Checks if all cards in all main piles are showing their front side (needed for checking if the game is over).
     public static bool AllAreRevealedCompletely()
     {
         foreach (MainPile mainPile in allMainPiles)
@@ -51,6 +52,7 @@ public class MainPile : InteractableCardPile
             AddChildCards(childCards);
     }
 
+    // When a card with children is dragged onto this pile, this method adds them to this pile, too.
     private void AddChildCards(Card[] childCards)
     {
         foreach (Card childCard in childCards)
@@ -72,6 +74,8 @@ public class MainPile : InteractableCardPile
         if (Cards.Count > 0 && TopCard.CurrentlyShowingSide == CardSide.Back)
         {            
             TopCard.ShowSide(CardSide.Front);
+            // When a card gets flipped to the front, it will be saved in this history step.
+            // This ensures that the card will be flipped back when the player undos this step.
             History.flippedCard = TopCard;
         }
     }
@@ -81,7 +85,7 @@ public class MainPile : InteractableCardPile
         return bottomCard.CurrentlyShowingSide == CardSide.Front &&
                bottomCard.Color != topCard.Color &&
                topCard.value == bottomCard.value - 1 &&
-               bottomCard.transform.childCount == 0;
+               bottomCard == TopCard;
     }
 
     public bool IsRevealedCompletely()

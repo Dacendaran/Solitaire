@@ -1,21 +1,8 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class OpenDrawPile : CardPile
 {
     public ClosedDrawPile closedDrawPile;
-
-    public void Add(List<Card> cards)
-    {
-        foreach(Card card in cards)
-        {
-            card.transform.parent = transform;
-            card.ShowSide(CardSide.Front);
-            base.Add(card, false);
-        }
-
-        SetCardPositions();
-    }
 
     public override void Add(Card cardToAdd, bool addStepToHistory = true)
     {
@@ -29,6 +16,7 @@ public class OpenDrawPile : CardPile
         SetCardPositions();     
     }
 
+    // Shifts the top 2 cards slightly, so the player can always see the top 3 cards.
     private void SetCardPositions()
     {
         int offsetMultiplicator = Cards.Count > 2 ? 2 : Cards.Count - 1;

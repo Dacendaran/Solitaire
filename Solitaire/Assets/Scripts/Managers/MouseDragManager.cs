@@ -17,6 +17,7 @@ public class MouseDragManager : MonoBehaviour
         positionLastFrame = MousePosition;
     }
 
+    // Manages the execution of OnBeginDrag, OnDrag and OnEndDrag of cards.
     private void Update()
     {
         if (!draggingEnabled)
