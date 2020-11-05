@@ -96,9 +96,4 @@ public class Card : MonoBehaviour, ICardEndDragTarget
         if (increaseActionCounter)
             GameManager.Instance.ActionCounter++;
     }
-
-    public void Add(Card cardToPutOn, bool addStepToHistory = true)
-    {        
-        CardPile.Add(cardToPutOn, true);
-    }
 }
