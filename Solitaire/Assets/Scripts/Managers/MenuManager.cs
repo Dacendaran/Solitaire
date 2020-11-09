@@ -16,4 +16,7 @@ public class MenuManager : MonoBehaviour
     // If the highcore canvas is shown, both buttons are not interactable (and the other way around).
     public void ToggleUndoButton() => undoButton.interactable = !undoButton.interactable;
     public void ToggleGiveNewCardsButton() => giveNewCardsButton.interactable = !giveNewCardsButton.interactable;
+
+    // Gets executed by the respective button in the menu bar UI.
+    public void Quit() => Application.Quit();
 }
